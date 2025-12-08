@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Login | Fraud App Detector{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">Welcome Back!</h2>
+                    <p class="text-muted">Log in to review apps & detect fraud</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Password</label>
+                        {{ form.password }}
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            Invalid username or password.
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        Login
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    <p>Don't have an account? 
+                        <a href="{% url 'register' %}" class="text-primary fw-semibold">Register here</a>
+                    </p>
+                    <!-- Optional: Add "Forgot Password" later -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
