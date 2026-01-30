@@ -25,24 +25,45 @@ class Application(models.Model):
         return self.name
 
 
+
 class Review(models.Model):
-    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
-    text = models.TextField()                              # User's comment
-    rating = models.IntegerField(choices=[(1,1),(2,2),(3,3),(4,4),(5,5)], blank=True, null=True)
-    
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+
+    text = models.TextField()  # User's comment
+    rating = models.IntegerField(
+        choices=[(1,1),(2,2),(3,3),(4,4),(5,5)],
+        blank=True,
+        null=True
+    )
+
+    # IP address of reviewer
+    ip_address = models.GenericIPAddressField(
+        blank=True,
+        null=True
+    )
+
     # Filled automatically by sentiment analysis
-    sentiment = models.CharField(max_length=20, blank=True, null=True)  # Positive / Negative / Neutral
-    sentiment_score = models.FloatField(blank=True, null=True)          # e.g. 0.85 or -0.72
-    
+    sentiment = models.CharField(max_length=20, blank=True, null=True)
+    sentiment_score = models.FloatField(blank=True, null=True)
+
     # Admin can mark fake review
     is_fake = models.BooleanField(default=False)
     admin_note = models.TextField(blank=True, null=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} → {self.application.name}"
+
 
 
 class Feedback(models.Model):

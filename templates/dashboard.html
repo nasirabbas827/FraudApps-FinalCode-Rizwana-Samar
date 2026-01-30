@@ -1,161 +1,236 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard • FraudGuard{% endblock %}
+{% block title %}Insights Dashboard • FraudGuard{% endblock %}
+
+{% block css %}
+<style>
+    .hero-section {
+        padding: 4rem 0;
+        background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    }
+
+    /* Glass Search Styling */
+    .search-container {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .form-control-modern {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 0.8rem 1.2rem;
+        transition: all 0.3s;
+    }
+
+    .form-control-modern:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-glow);
+        outline: none;
+    }
+
+    /* App Card Evolution */
+    .app-card {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid #f1f5f9;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+    }
+
+    .app-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    }
+
+    .rank-badge {
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(4px);
+        color: white;
+        font-weight: 800;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .fraud-indicator {
+        background: #fee2e2;
+        color: #ef4444;
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #fecaca;
+    }
+
+    /* Score Progress Bar */
+    .sentiment-bar {
+        height: 6px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .sentiment-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 1s ease-in-out;
+    }
+
+    .carousel-inner {
+        border-radius: 28px;
+        box-shadow: 0 30px 60px -12px rgba(99, 102, 241, 0.25);
+    }
+
+    .carousel-caption-glass {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 2rem !important;
+        bottom: 40px !important;
+        max-width: 80%;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-
-    <!-- Hero Header -->
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-gradient mb-3">
-            FraudGuard • Review Authenticity System
-        </h1>
-        <p class="lead text-muted fs-5">
-            Discover real user sentiment • Detect fake reviews • Stay safe from fraud apps
+<div class="hero-section text-center">
+    <div class="container">
+        <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2 mb-3 fw-bold">AI POWERED ANALYSIS</span>
+        <h1 class="display-4 fw-800 text-dark tracking-tight mb-3">Intelligence for <span class="text-primary">Authentic</span> Apps.</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Our neural networks scan thousands of reviews to separate genuine feedback from fraudulent manipulation.
         </p>
     </div>
+</div>
 
-    <!-- Search & Filter Bar -->
-    <div class="card shadow-lg-custom border-0 mb-5 overflow-hidden">
-        <div class="card-body p-4">
-            <form method="get" class="row g-3 align-items-center">
-                <div class="col-md-5">
-                    <div class="input-group input-group-lg">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" name="q" value="{{ query }}" 
-                               class="form-control border-start-0 ps-0" 
-                               placeholder="Search by app name or category..." style="font-size: 1.1rem;">
-                    </div>
+<div class="container mt-n5">
+    <div class="search-container mb-5">
+        <form method="get" class="row g-3">
+            <div class="col-lg-5">
+                <div class="position-relative">
+                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" name="q" value="{{ query }}" class="form-control-modern ps-5 w-100" placeholder="Search app name or ecosystem...">
                 </div>
-                <div class="col-md-4">
-                    <select name="category" class="form-select form-select-lg">
-                        <option value="">All Categories</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
-                            {{ cat.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="fas fa-filter me-2"></i>Filter
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="col-lg-4">
+                <select name="category" class="form-control-modern form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <button type="submit" class="btn-modern w-100 py-2 h-100">
+                    <i class="fas fa-sliders-h me-2"></i> Apply Filters
+                </button>
+            </div>
+        </form>
     </div>
 
-    <!-- Recent Apps Carousel -->
     {% if recent_apps %}
-    <div class="mb-5">
-        <h2 class="text-center mb-4 fw-bold text-primary">
-            Recently Added Apps
-        </h2>
-        <div id="recentCarousel" class="carousel slide shadow-lg" data-bs-ride="carousel">
-            <div class="carousel-inner rounded-4 overflow-hidden">
+    <div class="mb-5 pb-4">
+        <h5 class="fw-bold mb-4 d-flex align-items-center">
+            <span class="bg-primary p-1 rounded-2 me-2"><i class="fas fa-bolt text-white fs-6"></i></span>
+            Latest Submissions
+        </h5>
+        <div id="recentCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
                 {% for app in recent_apps %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                    <img src="{% if app.image %}{{ app.image.url }}{% else %}https://via.placeholder.com/1200x500/4361ee/ffffff?text={{ app.name|urlencode }}{% endif %}"
-                         class="d-block w-100" style="height: 420px; object-fit: cover;" alt="{{ app.name }}">
-                    <div class="carousel-caption d-none d-md-block">
-                        <div class="bg-dark bg-opacity-80 rounded-3 p-4">
-                            <h3 class="fw-bold">{{ app.name }}</h3>
-                            <p class="mb-3">{{ app.description|truncatewords:20 }}</p>
-                            <a href="{% url 'app_detail' app.id %}" class="btn btn-warning btn-lg">
-                                View Reviews
-                            </a>
+                    <div class="position-relative">
+                        <img src="{% if app.image %}{{ app.image.url }}{% else %}https://via.placeholder.com/1200x500/1e293b/ffffff?text={{ app.name|urlencode }}{% endif %}"
+                             class="d-block w-100" style="height: 480px; object-fit: cover;" alt="{{ app.name }}">
+                        <div class="carousel-caption carousel-caption-glass d-none d-md-block">
+                            <h2 class="fw-800 mb-2">{{ app.name }}</h2>
+                            <p class="opacity-75 mb-4">{{ app.description|truncatewords:15 }}</p>
+                            <a href="{% url 'app_detail' app.id %}" class="btn btn-light rounded-pill px-4 fw-bold">Analyze Metadata</a>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-            <button class="carousel-control-prev" data-bs-target="#recentCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" data-bs-target="#recentCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
         </div>
     </div>
     {% endif %}
 
-    <!-- Ranking Title -->
-    <div class="text-center mb-5">
-        <h2 class="fw-bold text-gradient display-6">
-            Top Ranked Apps by User Sentiment
-        </h2>
-        <p class="text-muted">Based on real sentiment analysis • Updated live</p>
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h3 class="fw-800 text-dark mb-0">Market Sentiment</h3>
+            <p class="text-muted small mb-0">Verified rankings based on NLP score</p>
+        </div>
     </div>
 
-    <!-- Apps Grid -->
     <div class="row g-4">
         {% for app in apps %}
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100 position-relative overflow-hidden {% if app.is_fraud %}border-danger border-3{% endif %}">
-                <!-- Rank Badge -->
+            <div class="app-card h-100 position-relative {% if app.is_fraud %}border-danger-subtle shadow-sm{% endif %}">
                 <div class="position-absolute top-0 start-0 m-3 z-3">
-                    <span class="badge bg-dark fs-6 px-3 py-2">
-                        #{{ forloop.counter }}
-                    </span>
+                    <span class="rank-badge">#{{ forloop.counter }}</span>
                 </div>
 
-                <!-- Fraud Alert -->
                 {% if app.is_fraud %}
                 <div class="position-absolute top-0 end-0 m-3 z-3">
-                    <span class="badge bg-danger fs-6 px-3 py-2 badge-new">
-                        FRAUD ALERT
-                    </span>
+                    <span class="fraud-indicator">FRAUD DETECTED</span>
                 </div>
                 {% endif %}
 
-                {% if app.image %}
-                    <img src="{{ app.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                {% else %}
-                    <div class="bg-gradient text-center py-5" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="fas fa-mobile-alt fa-5x text-white opacity-75"></i>
-                    </div>
-                {% endif %}
-
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title fw-bold">{{ app.name }}</h5>
-                    {% if app.category %}
-                        <small class="text-muted mb-2">
-                            <i class="fas fa-tag"></i> {{ app.category.name }}
-                        </small>
-                    {% endif %}
-
-                    <p class="text-muted small flex-grow-1">{{ app.description|truncatechars:100 }}</p>
-
-                    <!-- Sentiment Score -->
-                    <div class="d-flex align-items-center justify-content-between mt-3">
-                        <div>
-                            <span class="badge fs-6 px-4 py-2
-                                {% if app.avg_score > 0.3 %}bg-success
-                                {% elif app.avg_score < -0.1 %}bg-danger
-                                {% else %}bg-warning text-dark{% endif %}">
-                                Sentiment: {{ app.avg_score|floatformat:3|default:"N/A" }}
-                            </span>
+                <div class="app-image-wrapper p-3 pb-0">
+                    {% if app.image %}
+                        <img src="{{ app.image.url }}" class="rounded-4 w-100" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-4 d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                            <i class="fas fa-cube fa-3x text-muted opacity-25"></i>
                         </div>
-                        <small class="text-muted">
-                            {{ app.reviews.count }} review{{ app.reviews.count|pluralize }}
-                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="mb-2">
+                        {% if app.category %}
+                            <span class="text-primary fw-bold small text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">{{ app.category.name }}</span>
+                        {% endif %}
+                        <h5 class="fw-800 text-dark mb-1">{{ app.name }}</h5>
+                    </div>
+                    
+                    <p class="text-muted small mb-4">{{ app.description|truncatechars:85 }}</p>
+
+                    <div class="mb-2 d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold">Sentiment Score</span>
+                        <span class="small fw-800 {% if app.avg_score > 0.3 %}text-success{% elif app.avg_score < -0.1 %}text-danger{% else %}text-warning{% endif %}">
+                            {{ app.avg_score|floatformat:2|default:"0.00" }}
+                        </span>
                     </div>
 
-                    <a href="{% url 'app_detail' app.id %}" class="btn btn-primary mt-4 w-100 fw-bold">
-                        View Analysis
-                    </a>
+                    <div class="sentiment-bar">
+                        {% with score=app.avg_score|default:0 %}
+                        <div class="sentiment-fill {% if score > 0.3 %}bg-success{% elif score < -0.1 %}bg-danger{% else %}bg-warning{% endif %}" 
+                             style="width: 75%;"></div> {% endwith %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="text-muted small">
+                            <i class="far fa-comment-alt me-1"></i> {{ app.reviews.count }} Reviews
+                        </div>
+                        <a href="{% url 'app_detail' app.id %}" class="btn-modern py-2 px-3 small">
+                            Full Report
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="text-center py-5">
-                <i class="fas fa-search fa-4x text-muted mb-4"></i>
-                <h4>No apps found</h4>
-                <p class="text-muted">Try adjusting your search or filters.</p>
-            </div>
+        <div class="col-12 text-center py-5">
+            <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" width="80" class="opacity-25 mb-3">
+            <h5 class="text-muted">No applications matching your criteria</h5>
         </div>
         {% endfor %}
     </div>
@@ -164,17 +239,9 @@
 
 {% block scripts %}
 <script>
-    // Auto-submit search on Enter
-    document.querySelector('input[name="q"]').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.target.closest('form').submit();
-        }
-    });
-
-    // Carousel
-    new bootstrap.Carousel('#recentCarousel', {
-        interval: 5000,
-        wrap: true
+    const carousel = new bootstrap.Carousel('#recentCarousel', {
+        interval: 4000,
+        pause: 'hover'
     });
 </script>
 {% endblock %}

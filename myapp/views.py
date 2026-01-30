@@ -5,11 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
-from django.http import HttpResponse
-from django.utils import timezone
-from django.db.models import Avg
-from datetime import timedelta
 import socket
+from django.db.models import Avg
 from .models import Application, Review, Category, Feedback
 
 # ==================== NLTK Sentiment Functions  ====================
@@ -190,53 +187,84 @@ def app_detail(request, app_id):
     return render(request, 'app_detail.html', context)
 
 
+ 
+
 @login_required
 def post_review(request, app_id):
     app = get_object_or_404(Application, id=app_id)
 
     if request.method == 'POST':
         text = request.POST.get('review_text', '').strip()
-        rating_str = request.POST.get('rating', '').strip()  # it's a string from form
+        rating_str = request.POST.get('rating', '').strip()
 
         if not text:
             messages.error(request, "Review text cannot be empty.")
             return redirect('app_detail', app_id=app_id)
 
-        # Convert rating safely (allow blank)
+        # ----------------------------
+        # Rating Validation
+        # ----------------------------
         rating = None
-        if rating_str and rating_str.isdigit():
+        if rating_str.isdigit():
             rating = int(rating_str)
             if rating < 1 or rating > 5:
-                rating = None  # invalid range
+                rating = None
 
-        ip = request.META.get('REMOTE_ADDR', 'Unknown')
+        # ----------------------------
+        # IP Address Capture (Socket)
+        # ----------------------------
+        try:
+            ip_address = socket.gethostbyname(socket.gethostname())
+        except Exception:
+            ip_address = None
 
-        # Sentiment Analysis with detailed logging
-        print(f"\nNew/Updated Review by {request.user.username} on '{app.name}'")
+        # ----------------------------
+        # Sentiment Analysis
+        # ----------------------------
         sentiment_label, sentiment_score = analyze_sentiment(text)
 
-        # Update or create review (one per user per app)
-        review, created = Review.objects.update_or_create(
+        # ----------------------------
+        # Count existing reviews by user for same app
+        # ----------------------------
+        review_count = Review.objects.filter(
             user=request.user,
-            application=app,
-            defaults={
-                'text': text,
-                'rating': rating,                    # safely pass None if not given
-                'sentiment': sentiment_label,
-                'sentiment_score': sentiment_score,
-                'is_fake': False,
-                'admin_note': None,
-            }
+            application=app
+        ).count()
+
+        # ----------------------------
+        # Fake Review Logic
+        # ----------------------------
+        is_fake = review_count >= 3
+        admin_note = (
+            "Auto-flagged: User posted more than 3 reviews on same application."
+            if is_fake else None
         )
 
-        if created:
-            messages.success(request, "Your review has been posted successfully!")
+        # ----------------------------
+        # Create Review (DO NOT update)
+        # ----------------------------
+        Review.objects.create(
+            user=request.user,
+            application=app,
+            text=text,
+            rating=rating,
+            ip_address=ip_address,
+            sentiment=sentiment_label,
+            sentiment_score=sentiment_score,
+            is_fake=is_fake,
+            admin_note=admin_note
+        )
+
+        if is_fake:
+            messages.warning(
+                request,
+                "Your review was posted but flagged for moderation due to multiple submissions."
+            )
         else:
-            messages.info(request, "Your review has been updated.")
+            messages.success(request, "Your review has been posted successfully!")
 
         return redirect('app_detail', app_id=app_id)
 
-    # If not POST, redirect to app detail
     return redirect('app_detail', app_id=app_id)
 
 

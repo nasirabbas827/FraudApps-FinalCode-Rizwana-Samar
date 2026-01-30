@@ -1,79 +1,164 @@
 {% extends 'base.html' %}
-{% block title %}My Reviews | Fraud App Detector{% endblock %}
+{% block title %}My Activity • FraudGuard{% endblock %}
+
+{% block css %}
+<style>
+    .review-timeline-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .review-timeline-card:hover {
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+        border-color: var(--glass-border);
+    }
+
+    .app-icon-mini {
+        width: 45px;
+        height: 45px;
+        background: var(--accent-glow);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-weight: 800;
+    }
+
+    .authenticity-stamp {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 4px 12px;
+        border-radius: 8px;
+    }
+
+    .sentiment-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+
+    .admin-callout {
+        border-left: 4px solid #ef4444;
+        background: #fff1f2;
+        padding: 1rem;
+        border-radius: 0 12px 12px 0;
+    }
+
+    .empty-state {
+        background: var(--glass-bg);
+        border: 2px dashed #e2e8f0;
+        border-radius: 30px;
+        padding: 5rem 1rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="text-center mb-5">
-        <h1 class="display-6 fw-bold text-primary">
-            My Reviews
-        </h1>
-        <p class="lead text-muted">All reviews you've submitted across apps</p>
+<div class="container py-5">
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-800 text-dark mb-1">My Activity</h2>
+            <p class="text-muted mb-0">Tracking your contributions to the ecosystem</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex bg-white p-2 rounded-4 shadow-sm">
+                <div class="px-3 border-end">
+                    <span class="d-block fw-800 text-primary">{{ reviews|length }}</span>
+                    <span class="text-muted small fw-bold uppercase">Total Reviews</span>
+                </div>
+                <div class="px-3">
+                    <span class="d-block fw-800 text-danger">
+                        {% if reviews %}{{ reviews|length }}{% else %}0%{% endif %}
+                    </span>
+                    <span class="text-muted small fw-bold uppercase">Reliability</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% if reviews %}
     <div class="row g-4">
         {% for review in reviews %}
         <div class="col-lg-6">
-            <div class="card h-100 shadow-sm border-0 {% if review.is_fake %}border-danger border-3{% endif %}">
-                <div class="card-body">
-                    <!-- App Name + Link -->
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h5 class="card-title mb-0">
-                            <a href="{% url 'app_detail' review.application.id %}" class="text-primary text-decoration-none">
-                                {{ review.application.name }}
-                            </a>
-                        </h5>
-                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+            <div class="review-timeline-card p-4 h-100 {% if review.is_fake %}border-danger{% endif %}">
+                
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="app-icon-mini me-3">
+                            {{ review.application.name|slice:":1" }}
+                        </div>
+                        <div>
+                            <h5 class="fw-800 mb-0">
+                                <a href="{% url 'app_detail' review.application.id %}" class="text-dark text-decoration-none">
+                                    {{ review.application.name }}
+                                </a>
+                            </h5>
+                            <span class="text-muted small">{{ review.created_at|date:"M d, Y" }}</span>
+                        </div>
                     </div>
-
-                    <!-- Star Rating -->
-                    {% if review.rating %}
-                    <div class="mb-2">
-                        {% for i in "12345" %}
-                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-secondary{% endif %}"></i>
-                        {% endfor %}
-                        <span class="ms-2 text-muted">(Rated {{ review.rating }}/5)</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Review Text -->
-                    <p class="card-text">{{ review.text }}</p>
-
-                    <!-- Sentiment Badge -->
-                    <div class="mt-3">
-                        <span class="badge fs-6 
-                            {% if review.sentiment == 'Positive' %}bg-success
-                            {% elif review.sentiment == 'Negative' %}bg-danger
-                            {% else %}bg-secondary{% endif %}">
-                            {{ review.sentiment }} 
-                            (Score: {{ review.sentiment_score|floatformat:3 }})
-                        </span>
-
-                        <!-- Fake Flag (if detected) -->
-                        {% if review.is_fake %}
-                            <span class="badge bg-danger ms-2">Fake Detected</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Admin Note (if any) -->
-                    {% if review.admin_note %}
-                    <div class="mt-3 p-3 bg-light rounded">
-                        <small class="text-danger">
-                            <strong>Admin Note:</strong> {{ review.admin_note }}
-                        </small>
-                    </div>
+                    
+                    {% if review.is_fake %}
+                        <span class="authenticity-stamp bg-danger text-white">Fake Detected</span>
+                    {% else %}
+                        <span class="authenticity-stamp bg-success-subtle text-success border border-success-subtle">Verified</span>
                     {% endif %}
                 </div>
+
+                {% if review.rating %}
+                <div class="mb-3">
+                    {% for i in "12345" %}
+                        <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-light{% endif %} small"></i>
+                    {% endfor %}
+                    <span class="text-muted small ms-2 fw-bold">{{ review.rating }}/5</span>
+                </div>
+                {% endif %}
+
+                <div class="p-3 bg-light rounded-4 mb-3">
+                    <p class="mb-0 text-dark small lh-base italic">"{{ review.text }}"</p>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <div class="sentiment-chip 
+                        {% if review.sentiment == 'Positive' %}bg-success-subtle text-success
+                        {% elif review.sentiment == 'Negative' %}bg-danger-subtle text-danger
+                        {% else %}bg-secondary-subtle text-secondary{% endif %}">
+                        <i class="fas {% if review.sentiment == 'Positive' %}fa-smile{% elif review.sentiment == 'Negative' %}fa-frown{% else %}fa-meh{% endif %} me-2"></i>
+                        {{ review.sentiment }} ({{ review.sentiment_score|floatformat:2 }})
+                    </div>
+                </div>
+
+                {% if review.admin_note %}
+                <div class="admin-callout mt-4">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fas fa-shield-alt text-danger me-2 small"></i>
+                        <span class="fw-800 text-danger small text-uppercase">Moderator Note</span>
+                    </div>
+                    <p class="small mb-0 text-muted">{{ review.admin_note }}</p>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-5 bg-light rounded-3">
-        <i class="fas fa-comment-slash fa-4x text-muted mb-4"></i>
-        <h4>No Reviews Yet</h4>
-        <p class="text-muted">You haven't reviewed any apps yet.</p>
-        <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">
+    <div class="empty-state text-center">
+        <div class="mb-4">
+            <i class="fas fa-feather fa-4x text-light opacity-50"></i>
+        </div>
+        <h4 class="fw-800">Your feed is quiet.</h4>
+        <p class="text-muted mx-auto mb-4" style="max-width: 400px;">
+            You haven't analyzed any apps yet. Your submissions and fraud reports will appear here.
+        </p>
+        <a href="{% url 'dashboard' %}" class="btn-modern px-5 text-decoration-none d-inline-block">
             Explore Apps
         </a>
     </div>

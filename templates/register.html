@@ -1,75 +1,120 @@
 {% extends 'base.html' %}
-{% block title %}Register | Fraud App Detector{% endblock %}
+{% block title %}Join FraudGuard | Secure Registration{% endblock %}
+
+{% block css %}
+<style>
+    /* Styling the Django form widgets to match the modern UI */
+    input {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #1e293b;
+        background-color: rgba(255, 255, 255, 0.8);
+        background-clip: padding-box;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    input:focus {
+        background-color: #fff;
+        border-color: #6366f1;
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .registration-container {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold text-primary">Create Account</h2>
-                    <p class="text-muted">Join the fight against fake apps!</p>
+<div class="row justify-content-center registration-container">
+    <div class="col-md-7 col-lg-5">
+        <div class="glass-card p-4 p-md-5">
+            <div class="text-center mb-5">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-user-plus text-primary fs-4"></i>
                 </div>
+                <h2 class="fw-800 tracking-tight text-dark">Create Account</h2>
+                <p class="text-muted small">Start verifying reviews with AI-powered insights</p>
+            </div>
 
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Username</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <small class="text-danger">{{ form.username.errors|join:", " }}</small>
-                        {% endif %}
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">First Name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Last Name</label>
-                            {{ form.last_name }}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        {{ form.email }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Password</label>
-                        {{ form.password1 }}
-                        <small class="form-text text-muted">
-                            Must be 8+ characters, not all numbers.
-                        </small>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Confirm Password</label>
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}
-                            <small class="text-danger">{{ form.password2.errors|join:", " }}</small>
-                        {% endif %}
-                    </div>
-
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors|join:", " }}
-                        </div>
+            <form method="post" class="needs-validation">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
                     {% endif %}
-
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        Create Account
-                    </button>
-                </form>
-
-                <div class="text-center mt-4">
-                    <p>Already have an account? 
-                        <a href="{% url 'login' %}" class="text-primary fw-semibold">Login here</a>
-                    </p>
                 </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label fw-bold">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Email Address</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Password</label>
+                    {{ form.password1 }}
+                    <div class="form-text text-muted" style="font-size: 0.75rem;">
+                        <i class="fas fa-info-circle me-1"></i> Use 8+ characters with mixed types.
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger small mt-1">{% for error in form.password2.errors %}{{ error }}{% endfor %}</div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert bg-danger-subtle text-danger border-0 rounded-3 small">
+                        {{ form.non_field_errors|join:", " }}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn-modern w-100 py-3 mt-2 fs-6">
+                    Create My Account <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-5 pt-3 border-top border-light">
+                <p class="text-muted small">Already a member? 
+                    <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none ms-1">Sign In</a>
+                </p>
             </div>
         </div>
     </div>

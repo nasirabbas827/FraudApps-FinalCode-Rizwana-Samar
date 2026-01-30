@@ -1,46 +1,105 @@
 {% extends 'base.html' %}
-{% block title %}Login | Fraud App Detector{% endblock %}
+{% block title %}Sign In | FraudGuard AI{% endblock %}
+
+{% block css %}
+<style>
+    /* Styling the Django form widgets */
+    input {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background-color: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input:focus {
+        border-color: var(--accent);
+        outline: 0;
+        box-shadow: 0 0 0 4px var(--accent-glow);
+        transform: scale(1.01);
+    }
+
+    .login-header-icon {
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin: 0 auto 1.5rem;
+        color: white;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .form-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        margin-left: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-container {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5 col-lg-4">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold text-primary">Welcome Back!</h2>
-                    <p class="text-muted">Log in to review apps & detect fraud</p>
+<div class="row justify-content-center align-items-center login-container" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 p-md-5">
+            <div class="text-center">
+                <div class="login-header-icon float-icon">
+                    <i class="fas fa-lock-open fs-5"></i>
                 </div>
+                <h3 class="fw-800 text-dark mb-1">Welcome back</h3>
+                <p class="text-muted small mb-5">Access your dashboard to verify reviews</p>
+            </div>
 
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Username</label>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label">Username</label>
+                    <div class="position-relative">
                         {{ form.username }}
                     </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Password</label>
-                        {{ form.password }}
-                    </div>
-
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            Invalid username or password.
-                        </div>
-                    {% endif %}
-
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                        Login
-                    </button>
-                </form>
-
-                <div class="text-center">
-                    <p>Don't have an account? 
-                        <a href="{% url 'register' %}" class="text-primary fw-semibold">Register here</a>
-                    </p>
-                    <!-- Optional: Add "Forgot Password" later -->
                 </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label class="form-label">Password</label>
+                        <a href="#" class="text-primary text-decoration-none" style="font-size: 0.75rem; font-weight: 600;">Forgot?</a>
+                    </div>
+                    {{ form.password }}
+                </div>
+
+                {% if form.errors %}
+                    <div class="alert bg-danger-subtle text-danger border-0 small rounded-3 py-2 px-3 mb-4">
+                        <i class="fas fa-exclamation-circle me-2"></i> Invalid credentials.
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn-modern w-100 py-3 mt-3 shadow-lg">
+                    Sign In <i class="fas fa-chevron-right ms-2 small"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-5">
+                <p class="text-muted small">New to FraudGuard? 
+                    <a href="{% url 'register' %}" class="text-primary fw-bold text-decoration-none ms-1">Create account</a>
+                </p>
             </div>
         </div>
     </div>

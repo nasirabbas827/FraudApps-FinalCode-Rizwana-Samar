@@ -1,83 +1,163 @@
 {% extends 'base.html' %}
 {% block title %}Feedback • FraudGuard{% endblock %}
 
+{% block css %}
+<style>
+    .feedback-hero {
+        padding: 3rem 0;
+    }
+
+    .feedback-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        background: white;
+        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--accent);
+        transform: rotate(-5deg);
+        transition: transform 0.3s ease;
+    }
+
+    .feedback-icon-wrapper:hover {
+        transform: rotate(0deg) scale(1.05);
+    }
+
+    .feedback-card {
+        background: white;
+        border-radius: 32px;
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.08);
+    }
+
+    .input-group-modern {
+        position: relative;
+    }
+
+    .form-control-feedback {
+        border: 2px solid #f1f5f9;
+        border-radius: 20px;
+        padding: 1.5rem;
+        background: #f8fafc;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        resize: none;
+    }
+
+    .form-control-feedback:focus {
+        background: white;
+        border-color: var(--accent);
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.1);
+        outline: none;
+    }
+
+    .btn-submit-feedback {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 1.2rem 3rem;
+        border-radius: 18px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-submit-feedback:hover {
+        background: #4f46e5;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+    }
+
+    .hint-box {
+        background: #f0fdf4;
+        border-radius: 16px;
+        padding: 1rem;
+        border: 1px solid #dcfce7;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-9 col-xl-8">
+        <div class="col-lg-8 col-xl-7">
 
-            <!-- Header -->
-            <div class="text-center mb-5">
-                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle p-4 mb-4">
-                    <i class="fas fa-comment-dots fa-3x text-primary"></i>
+            <div class="text-center feedback-hero">
+                <div class="feedback-icon-wrapper">
+                    <i class="fas fa-paper-plane fa-3x"></i>
                 </div>
-                <h1 class="display-5 fw-bold text-gradient mb-3">
-                    We Value Your Feedback
-                </h1>
-                <p class="lead text-muted fs-5 max-w-700 mx-auto">
-                    Your thoughts help us build a better fraud detection system. Every suggestion matters.
+                <h1 class="fw-800 text-dark display-6 mb-3">Help Us Evolve</h1>
+                <p class="text-muted fs-5 mx-auto mb-5" style="max-width: 500px;">
+                    Your insights directly influence our AI’s fraud detection patterns. Tell us what we can do better.
                 </p>
             </div>
 
-            <!-- Feedback Form Card -->
-            <div class="card shadow-lg-custom border-0 overflow-hidden">
-                <div class="card-header bg-gradient text-white text-center py-4" 
-                     style="background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;">
-                    <h3 class="mb-0 fw-bold">
-                        Share Your Experience
-                    </h3>
-                </div>
-
-                <div class="card-body p-5 p-lg-6">
+            <div class="feedback-card">
+                <div class="p-4 p-md-5">
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
 
-                        <div class="mb-4">
-                            <label for="message" class="form-label fw-semibold fs-5 text-dark">
-                                Your Message
-                            </label>
-                            <div class="position-relative">
+                        <div class="mb-5">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label for="message" class="fw-800 text-dark small text-uppercase tracking-wider">
+                                    Detailed Message
+                                </label>
+                                <span class="text-muted small" id="char-count">Min 20 characters</span>
+                            </div>
+                            
+                            <div class="input-group-modern">
                                 <textarea 
                                     name="message" 
                                     id="message"
-                                    class="form-control form-control-lg shadow-sm"
-                                    rows="9"
-                                    placeholder="Tell us what you liked, what can be improved, or report any issues..."
-                                    style="border-radius: 16px; font-size: 1.1rem; padding-top: 1rem;"
+                                    class="form-control-feedback w-100"
+                                    rows="8"
+                                    placeholder="I noticed the sentiment for finance apps seems off..."
                                     required
+                                    minlength="20"
                                 ></textarea>
-                                <div class="position-absolute top-0 start-0 mt-3 ms-3 text-primary opacity-50">
-                                    <i class="fas fa-edit fa-lg"></i>
+                                <div class="invalid-feedback ps-3">
+                                    Please provide a slightly more detailed message (at least 20 characters).
                                 </div>
                             </div>
-                            <div class="form-text text-muted mt-2">
-                                Be as detailed as you'd like — we read every single message
-                            </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <div class="text-center mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold">
-                                <i class="fas fa-paper-plane me-3"></i>
-                                Send Feedback
+                        <div class="text-center">
+                            <button type="submit" class="btn-submit-feedback">
+                                Send Report <i class="fas fa-chevron-right small"></i>
                             </button>
-                        </div>
-
-                        <!-- Info Note -->
-                        <div class="text-center mt-4">
-                            <p class="text-muted small">
-                                <i class="fas fa-shield-alt text-success me-2"></i>
-                                Your feedback is anonymous unless you mention your name.
-                            </p>
+                            
+                            <div class="mt-5 d-flex flex-wrap justify-content-center gap-4">
+                                <div class="d-flex align-items-center text-muted small fw-bold">
+                                    <i class="fas fa-user-secret text-primary me-2"></i> ANONYMOUS OPTION
+                                </div>
+                                <div class="d-flex align-items-center text-muted small fw-bold">
+                                    <i class="fas fa-bolt text-warning me-2"></i> QUICK RESPONSE
+                                </div>
+                                <div class="d-flex align-items-center text-muted small fw-bold">
+                                    <i class="fas fa-check-circle text-success me-2"></i> ENCRYPTED
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
+
+                <div class="bg-light p-4 text-center border-top">
+                    <p class="mb-0 text-muted small fw-bold">
+                        Looking to report a specific app as fraud? 
+                        <a href="{% url 'dashboard' %}" class="text-primary text-decoration-none ms-1">Visit the Dashboard <i class="fas fa-arrow-right small ms-1"></i></a>
+                    </p>
+                </div>
             </div>
 
-            <!-- Success Illustration (Optional) -->
-            <div class="text-center mt-5">
-                
-                <p class="text-muted mt-3">Thank you for helping us improve!</p>
+            <div class="text-center mt-5 opacity-50">
+                <p class="small text-muted mb-0">FraudGuard Ecosystem Feedback v2.0</p>
             </div>
 
         </div>
@@ -87,7 +167,6 @@
 
 {% block scripts %}
 <script>
-    // Bootstrap form validation
     (function () {
         'use strict'
         var forms = document.querySelectorAll('.needs-validation')
@@ -100,12 +179,23 @@
                 form.classList.add('was-validated')
             }, false)
         })
-    })()
 
-    // Auto-resize textarea (optional)
-    document.getElementById('message').addEventListener('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
+        // Simple character counter/indicator
+        const msgArea = document.getElementById('message');
+        const charCount = document.getElementById('char-count');
+
+        msgArea.addEventListener('input', function() {
+            const length = this.value.length;
+            if(length < 20) {
+                charCount.innerHTML = `<span class="text-danger">${20 - length} more to go...</span>`;
+            } else {
+                charCount.innerHTML = `<span class="text-success fw-bold">Ready to send!</span>`;
+            }
+            
+            // Auto-grow
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    })()
 </script>
 {% endblock %}
